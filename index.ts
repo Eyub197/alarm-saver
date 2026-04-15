@@ -1,5 +1,6 @@
-console.log("Hello via Bun!");
+import path from "node:path";
+import process from "node:process";
+import { authenticate } from "@google-cloud/local-auth";
+import { google } from "googleapis";
 
-// get work blocks from google calendar api
-// set notifications with notify send
-// optoinal add gimini-flash-lite for cusotom alarm messages depending on the next event turn offable
+console.log("Hello via Bun!");
