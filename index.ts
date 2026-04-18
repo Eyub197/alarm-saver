@@ -12,7 +12,7 @@ const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
 const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
 
 async function getEvents(): Promise<calendar_v3.Schema$Event[] | undefined> {
-	const auth : OAuth2Client = await authenticate({
+	const auth: OAuth2Client = await authenticate({
 		scopes: SCOPES,
 		keyfilePath: CREDENTIALS_PATH,
 	});
@@ -29,14 +29,19 @@ async function getEvents(): Promise<calendar_v3.Schema$Event[] | undefined> {
 		maxResults: 5,
 		singleEvents: true,
 		orderBy: "startTime",
-	})
+	});
 
 	return result.data.items;
 }
 
-async function getEventsEndTime(events: calendar_v3.Schema$Event[]) : Promise<string[] | Error>{
-  if (!events) throw new Error("No events found")
-  return events.map((event) => event.end?.dateTime).filter((time): time is string => time !== null);
+async function getEventsEndTime(
+	events: calendar_v3.Schema$Event[],
+): Promise<string[] | Error> {
+	if (!events) throw new Error("No events found");
+
+	return events
+		.map((event) => event.end?.dateTime)
+		.filter((time): time is string => time !== null);
 }
 
 async function sendAlarm(): Promise<void> {
@@ -46,12 +51,15 @@ async function sendAlarm(): Promise<void> {
 
 async function scheduleAlarm(): Promise<void> {
 	const events = await getEvents();
-	const deepWorkEndTime = await getEventsEndTime(events)
+	if (!events) return;
+
+	const deepWorkEndTime = await getEventsEndTime(events);
+	if (deepWorkEndTime instanceof Error) return;
 
 	deepWorkEndTime.forEach((deepWorkEndTime) => {
 		const endTime = new Date(deepWorkEndTime).getTime();
-		const delta = endTime - new Date().getTime();
-		setTimeout(sendAlarm, delta)
+		const delta = endTime - Date.now();
+		setTimeout(sendAlarm, delta);
 	});
 }
 
