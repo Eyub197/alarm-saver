@@ -1,10 +1,10 @@
 const config = {
-	CALENDAR_ID: manegeCalendarId(),
+	CALENDAR_ID: manageCalendarId(),
 	WAKE_UP_TIME: 7,
 	BEDTIME: 23,
 };
 
-export function manegeCalendarId() {
+export function manageCalendarId() {
 	const frindayAndSatrudayCalendarId =
 		"ccfcc92917f41b1ebb15adebeaae505aa22e7b1deef965818c93becb420f209e@group.calendar.google.com";
 	const mondayToThursadyCalendarId =

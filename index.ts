@@ -10,6 +10,7 @@ import type { OAuth2Client } from "googleapis-common";
 
 const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
 const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
+const alarms: ReturnType<typeof setTimeout>[] = [];
 
 async function getEvents(): Promise<calendar_v3.Schema$Event[] | undefined> {
 	const auth: OAuth2Client = await authenticate({
@@ -34,33 +35,37 @@ async function getEvents(): Promise<calendar_v3.Schema$Event[] | undefined> {
 	return result.data.items;
 }
 
-async function getEventsEndTime(
-	events: calendar_v3.Schema$Event[],
-): Promise<string[] | Error> {
+function getEventsEndTime(events: calendar_v3.Schema$Event[]): string[] {
 	if (!events) throw new Error("No events found");
 
 	return events
 		.map((event) => event.end?.dateTime)
-		.filter((time): time is string => time !== null);
+		.filter((time): time is string => time !== null && time !== undefined);
 }
 
 async function sendAlarm(): Promise<void> {
-	await Bun.$`notify-send -t 5000 'Hello alarm' 'this is an alarm'`;
+	await Bun.$`notify-send -t 5000 'end' 'get ready for your next activity'`;
 	await Bun.$`paplay /usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga`;
 }
 
 async function scheduleAlarm(): Promise<void> {
+	alarms.forEach((alarm) => {
+		clearTimeout(alarm);
+	});
+
+	alarms.length = 0;
 	const events = await getEvents();
 	if (!events) return;
 
-	const deepWorkEndTime = await getEventsEndTime(events);
-	if (deepWorkEndTime instanceof Error) return;
+	const deepWorkEndTimes = getEventsEndTime(events);
+	if (deepWorkEndTimes instanceof Error) return;
 
-	deepWorkEndTime.forEach((deepWorkEndTime) => {
+	deepWorkEndTimes.forEach((deepWorkEndTime) => {
 		const endTime = new Date(deepWorkEndTime).getTime();
 		const delta = endTime - Date.now();
-		setTimeout(sendAlarm, delta);
+		alarms.push(setTimeout(sendAlarm, delta));
 	});
 }
 
 scheduleAlarm();
+setInterval(scheduleAlarm, 60000);
