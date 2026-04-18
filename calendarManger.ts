@@ -11,7 +11,7 @@ import type { OAuth2Client } from "googleapis-common";
 const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
 const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
 
-export async function getAuthToken(): Promise<OAuth2Client> {
+async function getAuthToken(): Promise<OAuth2Client> {
 	const credentails = await Bun.file("credentials.json").json();
 	const clientId = credentails.installed.client_id;
 	const clinetSecret = credentails.installed.client_secret;
