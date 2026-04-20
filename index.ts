@@ -1,4 +1,8 @@
 import scheduleAlarm from "./alarmsManeger";
 
-scheduleAlarm();
-setInterval(scheduleAlarm, 60000);
+try {
+	await scheduleAlarm();
+	setInterval(scheduleAlarm, 60000);
+} catch (error) {
+	console.error(error);
+}

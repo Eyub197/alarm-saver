@@ -8,10 +8,16 @@ import { google } from "googleapis";
 import type { calendar_v3 } from "googleapis";
 import type { OAuth2Client } from "googleapis-common";
 
-const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
-const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
-
 async function getAuthToken(): Promise<OAuth2Client> {
+	const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
+	const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
+
+	if (!(await Bun.file("credentials.json").exists())) {
+		throw new Error(
+			"credentials.json is missing please download it from Google Cloud Console",
+		);
+	}
+
 	const credentails = await Bun.file("credentials.json").json();
 	const clientId = credentails.installed.client_id;
 	const clinetSecret = credentails.installed.client_secret;
@@ -59,8 +65,6 @@ export async function getEvents(): Promise<
 }
 
 export function getEventsEndTime(events: calendar_v3.Schema$Event[]): string[] {
-	if (!events) throw new Error("No events found");
-
 	return events
 		.map((event) => event.end?.dateTime)
 		.filter((time): time is string => time !== null && time !== undefined);

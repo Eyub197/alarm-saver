@@ -14,7 +14,11 @@ async function scheduleAlarm(): Promise<void> {
 
 	alarms.length = 0;
 	const events = await getEvents();
-	if (!events) return;
+
+	if (!events) {
+		console.log("There are no events for this date");
+		return;
+	}
 
 	const deepWorkEndTimes = getEventsEndTime(events);
 	if (deepWorkEndTimes instanceof Error) return;
@@ -24,7 +28,15 @@ async function scheduleAlarm(): Promise<void> {
 		const delta = endTime - Date.now();
 
 		if (delta < 0) return;
-		alarms.push(setTimeout(sendAlarm, delta));
+		alarms.push(
+			setTimeout(async () => {
+				try {
+					await sendAlarm();
+				} catch (error) {
+					console.error(error);
+				}
+			}, delta),
+		);
 	});
 }
 
