@@ -20,12 +20,16 @@ async function scheduleAlarm(): Promise<void> {
 		return;
 	}
 
+	console.log("Your alarms for today: ");
 	const deepWorkEndTimes = getEventsEndTime(events);
-	if (deepWorkEndTimes instanceof Error) return;
+	if (deepWorkEndTimes === undefined) return;
 
-	deepWorkEndTimes.forEach((deepWorkEndTime) => {
+	deepWorkEndTimes.forEach((deepWorkEndTime, index) => {
 		const endTime = new Date(deepWorkEndTime).getTime();
 		const delta = endTime - Date.now();
+		console.log(
+			`alarm ${index + 1} at ${new Date(deepWorkEndTime).toLocaleTimeString(undefined, { hour12: false })}`,
+		);
 
 		if (delta < 0) return;
 		alarms.push(

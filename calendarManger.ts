@@ -64,7 +64,14 @@ export async function getEvents(): Promise<
 	return result.data.items;
 }
 
-export function getEventsEndTime(events: calendar_v3.Schema$Event[]): string[] {
+export function getEventsEndTime(
+	events: calendar_v3.Schema$Event[],
+): string[] | undefined {
+	if (events.length === 0) {
+		console.log("There is no events. You are free today");
+		return;
+	}
+
 	return events
 		.map((event) => event.end?.dateTime)
 		.filter((time): time is string => time !== null && time !== undefined);
