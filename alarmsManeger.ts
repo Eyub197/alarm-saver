@@ -26,9 +26,9 @@ async function scheduleAlarm(): Promise<void> {
 
 	deepWorkEndTimes.forEach((deepWorkEndTime, index) => {
 		const endTime = new Date(deepWorkEndTime).getTime();
-		const delta = endTime - Date.now();
+		const delta = endTime - Date.now() - 60000 * 3;
 		console.log(
-			`alarm ${index + 1} at ${new Date(deepWorkEndTime).toLocaleTimeString(undefined, { hour12: false })}`,
+			`alarm ${index + 1} at ${new Date(endTime - 60000 * 3).toLocaleTimeString(undefined, { hour12: false })}`,
 		);
 
 		if (delta < 0) return;

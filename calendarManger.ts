@@ -61,7 +61,9 @@ export async function getEvents(): Promise<
 		orderBy: "startTime",
 	});
 
-	return result.data.items;
+	const events = result.data.items;
+
+	return events?.filter((event) => event.summary !== "Uni");
 }
 
 export function getEventsEndTime(
